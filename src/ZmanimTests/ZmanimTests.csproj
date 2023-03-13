@@ -15,6 +15,7 @@
 
     <!-- Disabled because SourceLink isn't referenced to calculate paths -->
     <DeterministicSourcePaths>false</DeterministicSourcePaths>
+    <TargetFrameworks>net472</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

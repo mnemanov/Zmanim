@@ -1388,5 +1388,15 @@ namespace ZmanimTests
             Assert.That(calendar.GetTemporalHour(), Is.EqualTo(3811823));
         }
 
+        [Test]
+        public void Check_DSTTransitionDate()
+        {
+            var zmanLocation = new DateWithLocation(new DateTime(2023, 3, 12), new Zmanim.Utilities.GeoLocation(40.542609, -82.355477, new Zmanim.TimeZone.WindowsTimeZone(TimeZoneInfo.Local)));
+            var cal = new ComplexZmanimCalendar(zmanLocation);
+            var result = cal.getTzaisBaalHatanya();
+            //result = cal.GetSunset();
+            Assert.That(result, Is.AtLeast(new DateTime(2023, 3, 12, 20, 0, 0)));
+        }
+
     }
 }
