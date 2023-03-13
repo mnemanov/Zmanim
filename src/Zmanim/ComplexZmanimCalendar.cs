@@ -3096,6 +3096,22 @@ namespace Zmanim
             return GetSunsetOffsetByDegrees(ZENITH_6_DEGREES);
         }
 
+        /**
+             * A method that returns <em>tzais</em> (nightfall) when the sun is x&deg; below the western geometric horizon
+             * (90&deg;) after {@link #getSunset sunset}
+             * 
+             * @return The <code>Date</code> of nightfall. If the calculation can't be computed such as northern and southern
+             *         locations even south of the Arctic Circle and north of the Antarctic Circle where the sun may not reach
+             *         low enough below the horizon for this calculation, a null will be returned. See detailed explanation on
+             *         top of the {@link AstronomicalCalendar} documentation.
+             * @see #ZENITH_6_DEGREES
+             */
+
+        public virtual DateTime? getTzaisByDegrees(Double deg)
+        {
+            return GetSunsetOffsetByDegrees(GEOMETRIC_ZENITH + deg);
+        }
+
         /// <summary>
         /// Returns a hash code for this instance.
         /// </summary>
