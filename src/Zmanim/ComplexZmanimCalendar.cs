@@ -253,6 +253,16 @@ namespace Zmanim
         /// </summary>
         protected internal const double ZENITH_5_POINT_88 = GEOMETRIC_ZENITH + 5.88;
 
+        /**
+             * The zenith of 6&deg; below {@link #GEOMETRIC_ZENITH geometric zenith} (90&deg;). This calculation is used for calculating
+             * <em>tzais</em> (nightfall) based on the opinion of the <em>Baal Hatanya</em>. This calculation is based on the position
+             * of the sun 24 minutes after {@link #getSunset sunset} in Jerusalem on March 16, about 4 days before the equinox, the day
+             * that a solar hour is 60 minutes, which is 6&deg; below {@link #GEOMETRIC_ZENITH geometric zenith}.
+             *
+             * @see #getTzaisBaalHatanya()
+             */
+        protected internal const double ZENITH_6_DEGREES = GEOMETRIC_ZENITH + 6;
+
         private double ateretTorahSunsetOffset = 40;
 
         /// <summary>
@@ -2921,7 +2931,7 @@ namespace Zmanim
         {
             return GetTimeOffset(
                 GetDateFromTime(
-                12.0 - DateWithLocation.Location.TimeZone.UtcOffset(DateWithLocation.Date) / HOUR_MILLIS),
+                12.0 - DateWithLocation.Location.TimeZone.UtcOffset(DateWithLocation.Date) / HOUR_MILLIS, true),
                                  -DateWithLocation.Location.GetLocalMeanTimeOffset(DateWithLocation.Date));
         }
 
@@ -3068,6 +3078,38 @@ namespace Zmanim
         public virtual DateTime? GetSofZmanBiurChametzMGA16Point1Degrees()
         {
             return GetTimeOffset(GetAlos16Point1Degrees(), GetShaahZmanis16Point1Degrees() * 5);
+        }
+
+        /**
+             * A method that returns <em>tzais</em> (nightfall) when the sun is 6&deg; below the western geometric horizon
+             * (90&deg;) after {@link #getSunset sunset}. For information on the source of this calculation see
+             * {@link #ZENITH_6_DEGREES}.
+             * 
+             * @return The <code>Date</code> of nightfall. If the calculation can't be computed such as northern and southern
+             *         locations even south of the Arctic Circle and north of the Antarctic Circle where the sun may not reach
+             *         low enough below the horizon for this calculation, a null will be returned. See detailed explanation on
+             *         top of the {@link AstronomicalCalendar} documentation.
+             * @see #ZENITH_6_DEGREES
+             */
+        public virtual DateTime? getTzaisBaalHatanya()
+        {
+            return GetSunsetOffsetByDegrees(ZENITH_6_DEGREES);
+        }
+
+        /**
+             * A method that returns <em>tzais</em> (nightfall) when the sun is x&deg; below the western geometric horizon
+             * (90&deg;) after {@link #getSunset sunset}
+             * 
+             * @return The <code>Date</code> of nightfall. If the calculation can't be computed such as northern and southern
+             *         locations even south of the Arctic Circle and north of the Antarctic Circle where the sun may not reach
+             *         low enough below the horizon for this calculation, a null will be returned. See detailed explanation on
+             *         top of the {@link AstronomicalCalendar} documentation.
+             * @see #ZENITH_6_DEGREES
+             */
+
+        public virtual DateTime? getTzaisByDegrees(Double deg)
+        {
+            return GetSunsetOffsetByDegrees(GEOMETRIC_ZENITH + deg);
         }
 
         /// <summary>

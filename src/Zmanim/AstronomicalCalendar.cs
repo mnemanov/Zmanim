@@ -194,7 +194,7 @@ namespace Zmanim
             if (double.IsNaN(sunrise))
                 return null;
 
-            return GetDateFromTime(sunrise);
+            return GetDateFromTime(sunrise, true);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Zmanim
             if (double.IsNaN(sunrise))
                 return null;
 
-            return GetDateFromTime(sunrise);
+            return GetDateFromTime(sunrise, true);
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace Zmanim
             if (double.IsNaN(sunset))
                 return null;
 
-            return GetAdjustedSunsetDate(GetDateFromTime(sunset), GetSunrise());
+            return GetDateFromTime(sunset, false);
         }
 
         /// <summary>
@@ -315,13 +315,26 @@ namespace Zmanim
         /// not rise, and one where it does not set, a null will be returned.
         /// See detailed explanation on top of the page.
         /// </returns>
+        /// 
+
+        /* not used in current code, removed in the java version. M.N. 2023-03-12
         private DateTime? GetAdjustedSunsetDate(DateTime? sunset, DateTime? sunrise)
         {
             if (sunset == null || sunrise == null || sunrise.Value.CompareTo(sunset.Value) < 0)
                 return sunset;
 
-            return sunset.Value.AddDays(1);
+            var adjustedSunset = sunset.Value.AddDays(1);
+            if (DateWithLocation.Location.TimeZone.IsDaylightSavingTime(adjustedSunset) && !DateWithLocation.Location.TimeZone.IsDaylightSavingTime(sunset.Value))
+            {
+                adjustedSunset = adjustedSunset.AddHours(1);
+            }
+            else if (!DateWithLocation.Location.TimeZone.IsDaylightSavingTime(adjustedSunset) && DateWithLocation.Location.TimeZone.IsDaylightSavingTime(sunset.Value))
+            {
+                adjustedSunset = adjustedSunset.AddHours(-1);
+            }
+            return adjustedSunset;
         }
+        */
 
         /// <summary>
         /// Method that returns the sunset without correction for elevation.
@@ -346,7 +359,7 @@ namespace Zmanim
             if (double.IsNaN(sunset))
                 return null;
 
-            return GetAdjustedSunsetDate(GetDateFromTime(sunset), GetSeaLevelSunrise());
+            return GetDateFromTime(sunset, false);
         }
 
         /// <summary>
@@ -462,7 +475,7 @@ namespace Zmanim
             if (double.IsNaN(alos))
                 return null;
 
-            return GetDateFromTime(alos);
+            return GetDateFromTime(alos, true);
         }
 
         ///<summary>
@@ -485,7 +498,7 @@ namespace Zmanim
             if (double.IsNaN(sunset))
                 return null;
 
-            return GetAdjustedSunsetDate(GetDateFromTime(sunset), GetSunriseOffsetByDegrees(offsetZenith));
+            return GetDateFromTime(sunset, false);
         }
 
         /// <summary>
@@ -667,7 +680,7 @@ namespace Zmanim
         ///  The time to be set as the time for the <c>DateTime</c>.
         ///  The time expected is in the format: 18.75 for 6:45:00 PM </param>
         ///<returns> The Date. </returns>
-        protected internal virtual DateTime? GetDateFromTime(double time)
+        protected internal virtual DateTime? GetDateFromTime(double time, Boolean isSunrise)
         {
             if (double.IsNaN(time))
                 return null;
@@ -684,6 +697,17 @@ namespace Zmanim
             time -= seconds; // milliseconds
 
             var date = DateWithLocation.Date;
+            // Check if a date transition has occurred, or is about to occur - this indicates the date of the event is
+            // actually not the target date, but the day prior or after
+            int localTimeHours = (int)DateWithLocation.Location.Longitude / 15;
+            if (isSunrise && localTimeHours + hours > 18)
+            {
+                date = date.AddDays(-1);
+            }
+            else if (!isSunrise && localTimeHours + hours < 6)
+            {
+                date = date.AddDays(1);
+            }
 
             var utcDateTime = new DateTime(
                 date.Year, date.Month, date.Day,
@@ -691,7 +715,21 @@ namespace Zmanim
                 DateTimeKind.Unspecified);
 
             long localOffset = DateWithLocation.Location.TimeZone.UtcOffset(utcDateTime);
-            return utcDateTime.AddMilliseconds(localOffset);
+            var newTime = utcDateTime.AddMilliseconds(localOffset);
+
+            //from java version of code, updated to handle this date transition (hopefully) correctly
+            //https://github.com/KosherJava/zmanim/blob/6be27e250b6c40df97ed6d977426110319b24e63/src/main/java/com/kosherjava/zmanim/AstronomicalCalendar.java#L547
+            //M.N. 2023-03-12.
+
+            //For LA first day of DST or for Australia on last day of DST, was not picking up correct localoffset based on DST transition. M.N. 3/12/2023
+            var utcDst = DateWithLocation.Location.TimeZone.IsDaylightSavingTime(utcDateTime);
+            var newDst = DateWithLocation.Location.TimeZone.IsDaylightSavingTime(newTime);
+            if (utcDst != newDst)
+            {
+                newTime = newTime.AddHours(newDst ? 1 : -1);
+            }
+            return newTime;
+            //return utcDateTime.AddMilliseconds(localOffset);
         }
 
         /// <summary>

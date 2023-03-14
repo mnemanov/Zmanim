@@ -31,6 +31,7 @@ Please note: due to atmospheric conditions (pressure, humidity and other conditi
     <AssemblyName>Zmanim</AssemblyName>
     <MinClientVersion>2.12</MinClientVersion>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <TargetFrameworks>net472</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

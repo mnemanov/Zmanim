@@ -11,6 +11,7 @@
 
     <!-- Disabled because SourceLink isn't referenced to calculate paths -->
     <DeterministicSourcePaths>false</DeterministicSourcePaths>
+    <TargetFrameworks></TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
