@@ -697,6 +697,10 @@ namespace Zmanim
             time -= seconds; // milliseconds
 
             var date = DateWithLocation.Date;
+
+            //from java version of code, updated to handle this date transition (hopefully) correctly
+            //https://github.com/KosherJava/zmanim/blob/6be27e250b6c40df97ed6d977426110319b24e63/src/main/java/com/kosherjava/zmanim/AstronomicalCalendar.java#L547
+            //M.N. 2023-03-12.
             // Check if a date transition has occurred, or is about to occur - this indicates the date of the event is
             // actually not the target date, but the day prior or after
             int localTimeHours = (int)DateWithLocation.Location.Longitude / 15;
@@ -716,10 +720,6 @@ namespace Zmanim
 
             long localOffset = DateWithLocation.Location.TimeZone.UtcOffset(utcDateTime);
             var newTime = utcDateTime.AddMilliseconds(localOffset);
-
-            //from java version of code, updated to handle this date transition (hopefully) correctly
-            //https://github.com/KosherJava/zmanim/blob/6be27e250b6c40df97ed6d977426110319b24e63/src/main/java/com/kosherjava/zmanim/AstronomicalCalendar.java#L547
-            //M.N. 2023-03-12.
 
             //For LA first day of DST or for Australia on last day of DST, was not picking up correct localoffset based on DST transition. M.N. 3/12/2023
             var utcDst = DateWithLocation.Location.TimeZone.IsDaylightSavingTime(utcDateTime);
