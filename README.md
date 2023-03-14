@@ -12,6 +12,9 @@ Please note: due to atmospheric conditions (pressure, humidity and other conditi
 The calculation of zmanim is dependant on Atmospheric refraction (refraction of sunlight through the atmosphere), and zmanim can be off by up to 2 minutes based on atmospheric conditions.
 Inaccuracy is increased by elevation. It is not the intent of this API to provide any guarantee of accuracy.
 
+Forked from Yitzchok/Zmanim
+Primarily fixed bugs on DST transition in function AstrononicalCalendar.GetDateFromTime(). 'DateWithLocation.Location.TimeZone.UtcOffset(utcDateTime)' does not offset correctly if UTC time is before DST change but local time is in DST (e.g. getting sunrise in Australia on first day of transition) or vice versa (e.g. getting tzais in Los Angeles on last day of DST when it is already standard time in UTC). Also added date adjustment
+
 
 TODO:
     * Make it Linq friendly.
